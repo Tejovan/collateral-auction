@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Callable, Any
 import numpy as np
 import numpy.typing as npt
 from collateral_position_auction import CollateralPositionAuction
@@ -9,6 +9,7 @@ class MonteCarloAuction:
     def __init__(
         self,
         auction: CollateralPositionAuction,
+        auction_parameters: Dict[str, Any],
         num_simulations: int,
         sender_type_distribution: Dict[str, float],
         seed: Optional[int] = None
@@ -31,6 +32,7 @@ class MonteCarloAuction:
             raise ValueError("Sender type probabilities must sum to 1")
 
         self.auction = auction
+        self.auction_parameters = auction_parameters
         self.num_simulations = num_simulations
         self.sender_type_distribution = sender_type_distribution
         
@@ -38,7 +40,7 @@ class MonteCarloAuction:
             np.random.seed(seed)
         self.seed = seed
 
-        self._results: List[float] = []
+        self._results: List[CollateralPositionAuction] = []
 
     def run_simulation(self) -> npt.NDArray[np.float64]:
         """Run the Monte Carlo simulation.
@@ -46,8 +48,9 @@ class MonteCarloAuction:
         Returns:
             Array of simulation results
         """
+        // Run the auction num_simulations times and store results.... need to fix this. initiate the sender messages, then make it instantiate an auction, run it,
         self._results = [
-            self.auction.run()
+            self.auction(self.auction_parameters, ).run_auction()
             for _ in range(self.num_simulations)
         ]
         return np.array(self._results)
