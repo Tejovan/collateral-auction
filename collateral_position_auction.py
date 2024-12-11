@@ -1,4 +1,7 @@
 from typing import Callable, Dict, List, Any
+import numpy as np
+import random
+import scipy.stats as stats
 
 class SenderMessage:
     """Represents a sender message instance in a collateral position auction."""
@@ -15,8 +18,29 @@ class SenderMessage:
         self.sender_value = sender_value
         self.recipient_value = recipient_value
 
-def __repr__(self) -> str:
-    return f"SenderMessage(message_id={self.message_id}, sender_value={self.sender_value}, recipient_value={self.recipient_value})"
+    def __repr__(self) -> str:
+        return f"SenderMessage(message_id={self.message_id}, sender_value={self.sender_value}, recipient_value={self.recipient_value})"
+
+def generate_sender_messages(num_messages: int, sender_value_dist: stats.rv_continuous, recipient_value_dist: stats.rv_continuous) -> List[SenderMessage]:
+    """Generate a list of SenderMessage instances with values sampled from the given distribution with ids starting from 1.
+
+    Args:
+        num_messages: Number of sender messages to generate.
+        sender_value_dist: Distribution for sender values.
+        recipient_value_dist: Distribution for recipient values.
+
+    Returns:
+        List of generated SenderMessage instances.
+    """
+
+    sender_ids = np.arange(1, num_messages + 1)
+    sender_values = sender_value_dist.rvs(size=num_messages)
+    recipient_values = recipient_value_dist.rvs(size=num_messages)
+
+    sender_messages = [
+        SenderMessage(id=id, sender_value=sv, recipient_value=rv)
+        for id, sv, rv in zip(sender_ids, sender_values, recipient_values)
+    ]
 
 
 class CollateralPositionAuction:
