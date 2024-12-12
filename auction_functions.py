@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional, Tuple, Callable, Any
 import numpy as np
 import numpy.typing as npt
-from collateral_position_auction import CollateralPositionAuction, SenderMessage
+from OLDcollateral_position_auction import CollateralPositionAuction, SenderMessage
 
 class MonteCarloAuction:
     def __init__(

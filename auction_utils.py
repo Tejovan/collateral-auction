@@ -7,7 +7,54 @@ import scipy.stats as stats
 
 # in summary research, want the simulation to be able to choose which r-s message type sampling method it wants to use... along with the 
 # distribution specified... and this will output a set of m(number of iterations/re-samples) lists of n(number of senders) messages, 
-# with each list being sampled using some method, like quasi-mc, or inman-connover, or gibbs sampling or other mcmc method 
+# with each list being sampled using some method, like quasi-mc, or iman-connover, or cholesky multiplication, or gibbs sampling or other mcmc method 
+
+# so, the architecture should be such that the v and e parameters are drawn at the same time for each bidder in a set of bidders in each sampling of a potential bidder set.
+
+# global parameters -- not global, just maybe constants within an instance of the simulation class.... 
+# max and min values of e and v, or relative ratios....   maybe this should just be part of the distribution setting.... which relates tto the sampling architecture
+# the resolution, or the number, of binning of the e-space for the tau function slices
+# number of senders, and amount of attention....
+
+# also, we want to parameterize the tau function so that it is a bunch of chunks, slices and each slice gets a different threshold value, 
+# which is the expected penalty someone will pay at that slice... 
+
+# what output?? want to plot the message points colored by their resulting utility...
+# or maybe by the expected utility over many samples... so maybe a bluring of the many runs into a color gradient which is the average... 
+# and then also plot the participation-threshold and the tau function that was set... 
+
+# want to plot the objective as a function of the tau parameters...
+# or more ideally, plot the optimal tau function as a function of objective function parameters.... 
+# 
+# tau parameterization will effect the form of expression of optimality.... might need to fix this somehow... atleast for each simulation instance
+# and sampling distribution, and allocation/payment rules, will obviously change the strategy strategy of the situation, and what is the optimal tau.
+#
+# for each tau parameter setting that I want to sample/test, need to run a resampling sim of the auction....
+#    and be able to do this for a variety of sampstributions and auction rules, and potentially re-sampling/monte-carlo methods
+
+
+
+# write a class which is a costly_audit_form...  NO specify participation_threshold_form 
+#   which has a method for taking a given externality value and outputting the expected charge
+#   and a method for generating a sampling of possible tau forms....
+
+# what forms do I want to use... could use general logistic...
+# or a cubic polynomial...
+# or just lines...
+# or a multi-step function, sliced into many chunks... leads to terribly many parameters and combinations to try... only could do a 5x5 grid, 5^5 permutations
+
+
+# how to calculate behavior threshold for a given sender?? 
+# just specify that instead, and then use the sampling to estimate the expected k+1th order statistic, and then subtract that from the behavior threshold to find the tau....
+# or just reframe this as just picking type dependent expected reserve payments... and then the details of what tau function implements that is a separate question
+# technically the expected payment is the expected k+1th given that one draw (their own) has already been rrealized....
+
+# SUMMARY
+# need a distribution and sampling interface (class?)
+# need a participation_threshold_form interface (class?)
+# then creat a sampler instance for basic uniform
+# then create a participation_threshold_form instance for a simple linear form... or for a cubic... or for a multi-step function... or for general logistic?
+
 
 class SenderMessage:
     """Represents a sender message instance in a collateral position auction."""
@@ -90,9 +137,9 @@ class CollateralPositionAuction:
         self.sender_reports = self.sender_reports_func(self)
         self.sender_allocations = self.allocate_position_func(self)
         self.sender_payments = self.calculate_payments_func(self)
-        self.expected_sender_utilities = self._calculate_expected_utilities()
+        self.expected_sender_utilities = self._calculate_expected_sender_utilities()
 
-    def _calculate_expected_utilities(self) -> Dict[SenderMessage, float]:
+    def _calculate_expected_sender_utilities(self) -> Dict[SenderMessage, float]:
         """Calculate expected utilities for each sender.
 
         Returns:
